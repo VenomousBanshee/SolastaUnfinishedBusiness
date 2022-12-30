@@ -1,9 +1,13 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
+using SolastaUnfinishedBusiness;
 using SolastaUnfinishedBusiness.Api;
 using SolastaUnfinishedBusiness.Api.Extensions;
+using SolastaUnfinishedBusiness.Builders;
+using SolastaUnfinishedBusiness.Builders.Features;
 using TA;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
@@ -648,13 +652,33 @@ internal static class GameUiContext
         }
     }
 
+    private static void LoadMonkKiPointsToggle()
+    {
+        _ = ActionDefinitionBuilder
+            .Create(DatabaseHelper.ActionDefinitions.MetamagicToggle, "MonkKiPointsToggle")
+            .SetOrUpdateGuiPresentation("Ki Points", "Toggle")
+            .SetActionId(ExtraActionId.MonkKiPointsToggle)
+            .AddToDB();
+
+        var actionAffinity = FeatureDefinitionActionAffinityBuilder
+            .Create(DatabaseHelper.FeatureDefinitionActionAffinitys.ActionAffinitySorcererMetamagicToggle,
+                "ActionAffinityMonkKiPointsToggle")
+            .SetGuiPresentationNoContent(true)
+            .SetAuthorizedActions((ActionDefinitions.Id) ExtraActionId.MonkKiPointsToggle)
+            .AddToDB();
+        
+        DatabaseHelper.CharacterClassDefinitions.Monk.FeatureUnlocks.Add(new FeatureUnlockByLevel(actionAffinity, 1));
+        
+    }
+    
     internal static void Load()
     {
         InventoryManagementContext.Load();
         SwitchCrownOfTheMagister();
         SwitchEmpressGarb();
         LoadRemoveBugVisualModels();
-
+        LoadMonkKiPointsToggle();
+        
         var inputService = ServiceRepository.GetService<IInputService>();
 
         // Dungeon Maker

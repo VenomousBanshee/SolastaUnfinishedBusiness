@@ -1117,4 +1117,18 @@ public static class RulesetCharacterPatcher
                 null;
         }
     }
+    
+    //PATCH: support Monk Ki Points Toggle
+    [HarmonyPatch(typeof(RulesetCharacter), "RemainingKiPoints", MethodType.Getter)]
+    [SuppressMessage("Minor Code Smell", "S101:Types should be named in PascalCase", Justification = "Patch")]
+    public static class RemainingKiPoints_Getter_Patch
+    {
+        public static void Postfix(RulesetCharacter __instance, ref int __result)
+        {
+            if (__instance.dummy.Contains(CharacterActionMonkKiPointsToggle.KiPointsTag))
+            {
+                __result = 0;
+            }
+        }
+    }
 }
